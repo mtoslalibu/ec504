@@ -11,10 +11,9 @@
 
 int main(int argc, const char * argv[]) {
     // insert code here...
-    std::cout << "Hello, World!\n";
-    vEB *v= new class vEB(256);
+    VEBTree *v= new class VEBTree(256);
     
-    for (int i=0; i<250; i = i+4) {
+    for (int i=0; i<250; i = i+3) {
         v->insert(i);
     }
     
@@ -22,7 +21,8 @@ int main(int argc, const char * argv[]) {
     printf("%d\n", v -> getMax());
     printf("%d\n", v -> getMin());
     printf("%d\n", (v -> successor(9)));
-    printf("%d\n", (v -> prediccessor(9)));
+    printf("%d\n", (v -> predecessor(9)));
+    printf(v->findItem(9)?"found\n":"not found\n");
     
     
     return 0;
