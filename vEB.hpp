@@ -1,154 +1,163 @@
 #pragma once
-
-#include <vector>
 #include <cmath>
+#include <vector>
 
 using namespace std;
 
-class vEB
+class VEBTree
 {
 public:
-    vEB(size_t minSize)
+    VEBTree(size_t sizeOfVEBTree)
     {
-        int k = int(ceil(log2(log2(minSize))));
-        uSize = int(pow(2, pow(2, k)));
+        int temp =int(ceil(log2(log2(sizeOfVEBTree))));
+
+        int k = temp;
+        temp = int(pow(2, pow(2, k)));
         
-        if(uSize > 2)
+        //floor(x/√M)
+        partitionSize = temp;
+        
+        if(partitionSize > 2)
         {
-            summary = new vEB(int(sqrt(double(uSize))));
+            //
+            temp = int(sqrt(double(partitionSize)));
+            summary = new VEBTree(temp);
             
-            int clusters = int(sqrt(double(uSize)));
-            if (uSize == 2)
+            temp = int(sqrt(double(partitionSize)));
+            int clusters = temp;
+            // if just partioned to 2 , then only 2 clusters
+            if (partitionSize == 2)
                 clusters = 2;
             for (int i = 0; i < clusters; i++)
             {
-                cluster.push_back(new vEB(int(sqrt(double(uSize)))));
+                temp = int(sqrt(double(partitionSize)));
+                cluster.push_back(new VEBTree(temp));
             }
         }
     }
-    vEB() {}
+    VEBTree() {}
     
-    void insert(int x)
+    void insert(int item)
     {
-        if (x < 0 || x >= uSize)
-            throw "OutOfIndex";
-        if (uSize == 2)
+        if (item >= partitionSize || item < 0 )
+            throw "Size is exceeded";
+        if (partitionSize == 2)
         {
-            data[x] = true;
+            data[item] = true;
             
             if (min == -1)
             {
-                min = x;
-                max = x;
+                min = item;
+                max = item;
                 return;
             }
             
-            if (x < min)
-                min = x;
-            if (x > max)
-                max = x;
+            if (item < min)
+                min = item;
+            if (item > max)
+                max = item;
             
             return;
         }
         
         if (min == -1)
         {
-            min = x;
-            max = x;
+            min = item;
+            max = item;
             return;
         }
         
-        if (x < min)
+        if (item < min)
         {
             int temp = min;
-            min = x;
-            x = temp;//swap x and min
+            min = item;
+            item = temp;//swap item and min
         }
-        if (x > max)
+        if (item > max)
         {
-            max = x;
+            max = item;
         }
         
-        if (cluster[high(x)]->min == -1)
+        if (cluster[high(item)]->min == -1)
         {
-            summary->insert(high(x));
+            summary->insert(high(item));
         }
         
-        cluster[high(x)]->insert(low(x));
+        cluster[high(item)]->insert(low(item));
     }
     
-    int successor(int x)
+    int successor(int item)
     {
-        if (x < min)
+        if (item < min)
             return min;
-        if (x > max)
-            return uSize;
+        if (item > max)
+            return partitionSize;
         
-        int i = high(x);
+        int i = high(item);
         int j;
         
-        if (uSize == 2)
+        if (partitionSize == 2)
         {
-            if (data[1] && x == 0)
+            if (data[1] && item == 0)
                 j = 1;
             else
                 j = 2;
         }
         else
         {
-            if (low(x) < cluster[i]->max)
+            if (low(item) < cluster[i]->max)
             {
-                j = cluster[i]->successor(low(x));
+                j = cluster[i]->successor(low(item));
             }
             else
             {
                 i = summary->successor(i);
-                if (i >= int(sqrt(double(uSize))))
-                    return uSize;
+                if (i >= int(sqrt(double(partitionSize))))
+                    return partitionSize;
                 j = cluster[i]->min;
             }
         }
         return index(i, j);
     }
     
-    int prediccessor(int x)
+    int predecessor(int item)
     {
-        if (x > max)
+        if (item > max)
             return max;
-        if (x < min)
+        if (item < min)
             return -1;
         
-        int i = high(x);
+        int i = high(item);
         int j;
         
-        if (uSize == 2)
+        if (partitionSize == 2)
         {
-            if (data[0] && x == 1)
+            if (data[0] && item == 1)
                 j = 0;
             else
                 j = -1;
         }
         else
         {
-            if (low(x) > cluster[i]->min && cluster[i]->min != -1)
+            if (low(item) > cluster[i]->min && cluster[i]->min != -1)
             {
-                j = cluster[i]->prediccessor(low(x));
+                j = cluster[i]->predecessor(low(item));
                 if (j == -1)
                     j = low(cluster[i]->min);
             }
-            else if (high(x) == high(min) && low(x) > low(min))
+            else if (high(item) == high(min) && low(item) > low(min))
             {
-                /*j = cluster[i]->prediccessor(low(x));
+                /*j = cluster[i]->predecessor(low(item));
                  if (j == -1)
                  j = cluster[i]->min;*/
                 j = low(min);
             }
             else
             {
-                i = summary->prediccessor(i);
+                i = summary->predecessor(i);
                 if (i < 0)
                 {
-                    if (high(min) < high(x))
+                    if (high(min) < high(item))
                         i = high(min);
                     else
                         return -1;
@@ -161,22 +170,22 @@ public:
         return index(i, j);
     }
     
-    void deleteValue(int x)
+    void deleteItem(int item)
     {
-        if (x < 0 || x >= uSize)
-            throw "OutOfIndex";
-        if (uSize == 2)
+        if (item < 0 || item >= partitionSize)
+            throw "Size is exceeded";
+        if (partitionSize == 2)
         {
-            data[x] = false;
+            data[item] = false;
             
-            if (min == x && max == x)
+            if (min == item && max == item)
             {
                 min = -1;
                 max = -1;
                 return;
             }
             
-            if (min == x)
+            if (min == item)
                 min = max;
             else
                 max = min;
@@ -184,7 +193,7 @@ public:
             return;
         }
         
-        if (x == min)
+        if (item == min)
         {
             int i = summary->min;
             if (i == -1)
@@ -194,14 +203,14 @@ public:
                 return;
             }
             min = index(i, cluster[i]->min);
-            x = min;
+            item = min;
         }
         
-        cluster[high(x)]->deleteValue(low(x));
-        if (cluster[high(x)]->min == -1)
-            summary->deleteValue(high(x));
+        cluster[high(item)]->deleteItem(low(item));
+        if (cluster[high(item)]->min == -1)
+            summary->deleteItem(high(item));
         
-        if (x == max)
+        if (item == max)
         {
             int i = summary->max;
             if (i == -1)
@@ -211,30 +220,14 @@ public:
         }
     }
     
-    int pop_front()
+    bool findItem(int item)
     {
-        int retVal = min;
-        if(retVal != -1)
-            
-            deleteValue(min);
-        return retVal;
-    }
-    
-    int pop_back()
-    {
-        int retVal = max;
-        deleteValue(max);
-        return retVal;
-    }
-    
-    bool trySearch(int x)
-    {
-        if (x == min || x == max)
+        if (item == min || item == max)
             return true;
-        if (x < min || x > max)
+        if (item < min || item > max)
             return false;
         
-        return cluster[high(x)]->trySearch(low(x));
+        return cluster[high(item)]->findItem(low(item));
         
     }
     
@@ -250,97 +243,30 @@ public:
     
     int size()
     {
-        return uSize;
+        return partitionSize;
     }
     
 protected:
     int min = -1; // None
     int max = -1;
-    int uSize;
+    int partitionSize;
     bool data[2] = { false, false };
-    vector<vEB*> cluster;
-    vEB* summary;
+    vector<VEBTree*> cluster;
+    VEBTree* summary;
 private:
     
     int index(int i, int j)
     {
-        return i * sqrt(double(uSize)) + j;
+        return i * sqrt(double(partitionSize)) + j;
     }
     int low(int x)
     {
-        return x % int(sqrt(double(uSize)));
+        return x % int(sqrt(double(partitionSize)));
     }
     int high(int x)
     {
-        return int(floor(x / sqrt(double(uSize))));
+        return int(floor(x / sqrt(double(partitionSize))));
     }
 };
 
-template<class T>
-class vEB_Vector
-{
-private:
-    vEB keyvEB;
-    vector<T> data;
-protected:
-public:
-    vEB_Vector(int minSize)
-    {
-        keyvEB = vEB(minSize);
-        data = vector<T>(keyvEB.size());
-    }
-    
-    void insert(int key, T value)
-    {
-        if (key >= keyvEB.size())
-            throw "OutOfRange";
-        keyvEB.insert(key);
-        data[key] = value;
-    }
-    
-    void deleteValue(int key)
-    {
-        keyvEB.deleteValue(key);
-        //data[key] = NULL; //TODO: what to put here
-    }
-    
-    void deleteValueAfter(int key)
-    {
-        key = keyvEB.successor(key);
-        deleteValue(key);
-    }
-    
-    void deleteValueBefore(int key)
-    {
-        key = keyvEB.prediccessor(key);
-        deleteValue(key);
-    }
-    
-    T* getAfter(int key)
-    {
-        key = keyvEB.successor(key);
-        return &data[key];
-    }
-    
-    T* getBefore(int key)
-    {
-        key = keyvEB.prediccessor(key);
-        return &data[key];
-    }
-    
-    T pop_front()
-    {
-        int key = keyvEB.pop_front();
-        T retVal = data[key];
-        //data[key] = NULL;
-        return retVal;
-    }
-    
-    T pop_back()
-    {
-        int key = keyvEB.pop_back();
-        T retVal = data[key];
-        //data[key] = NULL;
-        return retVal;
-    }
-};
+
