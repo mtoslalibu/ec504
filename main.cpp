@@ -11,19 +11,17 @@
 
 int main(int argc, const char * argv[]) {
     // insert code here...
-    VEBTree *v= new class VEBTree(256);
-    
+    VEBTree *v = new VEBTree(256);
+
     for (int i=0; i<250; i = i+3) {
         v->insert(i);
     }
-    
-    
+
     printf("%d\n", v -> getMax());
     printf("%d\n", v -> getMin());
     printf("%d\n", (v -> successor(9)));
     printf("%d\n", (v -> predecessor(9)));
     printf(v->findItem(9)?"found\n":"not found\n");
-    
-    
+
     return 0;
 }

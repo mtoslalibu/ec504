@@ -6,23 +6,23 @@ using namespace std;
 
 class VEBTree
 {
-public:
+    public:
     VEBTree(size_t sizeOfVEBTree)
     {
         int temp =int(ceil(log2(log2(sizeOfVEBTree))));
 
         int k = temp;
         temp = int(pow(2, pow(2, k)));
-        
+
         //floor(x/√M)
         partitionSize = temp;
-        
+
         if(partitionSize > 2)
         {
             //
             temp = int(sqrt(double(partitionSize)));
             summary = new VEBTree(temp);
-            
+
             temp = int(sqrt(double(partitionSize)));
             int clusters = temp;
             // if just partioned to 2 , then only 2 clusters
@@ -36,7 +36,7 @@ public:
         }
     }
     VEBTree() {}
-    
+
     void insert(int item)
     {
         if (item >= partitionSize || item < 0 )
@@ -44,29 +44,29 @@ public:
         if (partitionSize == 2)
         {
             data[item] = true;
-            
+
             if (min == -1)
             {
                 min = item;
                 max = item;
                 return;
             }
-            
+
             if (item < min)
                 min = item;
             if (item > max)
                 max = item;
-            
+
             return;
         }
-        
+
         if (min == -1)
         {
             min = item;
             max = item;
             return;
         }
-        
+
         if (item < min)
         {
             int temp = min;
@@ -77,25 +77,25 @@ public:
         {
             max = item;
         }
-        
+
         if (cluster[high(item)]->min == -1)
         {
             summary->insert(high(item));
         }
-        
+
         cluster[high(item)]->insert(low(item));
     }
-    
+
     int successor(int item)
     {
         if (item < min)
             return min;
         if (item > max)
             return partitionSize;
-        
+
         int i = high(item);
         int j;
-        
+
         if (partitionSize == 2)
         {
             if (data[1] && item == 0)
@@ -119,17 +119,17 @@ public:
         }
         return index(i, j);
     }
-    
+
     int predecessor(int item)
     {
         if (item > max)
             return max;
         if (item < min)
             return -1;
-        
+
         int i = high(item);
         int j;
-        
+
         if (partitionSize == 2)
         {
             if (data[0] && item == 1)
@@ -169,7 +169,7 @@ public:
         }
         return index(i, j);
     }
-    
+
     void deleteItem(int item)
     {
         if (item < 0 || item >= partitionSize)
@@ -177,22 +177,22 @@ public:
         if (partitionSize == 2)
         {
             data[item] = false;
-            
+
             if (min == item && max == item)
             {
                 min = -1;
                 max = -1;
                 return;
             }
-            
+
             if (min == item)
                 min = max;
             else
                 max = min;
-            
+
             return;
         }
-        
+
         if (item == min)
         {
             int i = summary->min;
@@ -205,11 +205,11 @@ public:
             min = index(i, cluster[i]->min);
             item = min;
         }
-        
+
         cluster[high(item)]->deleteItem(low(item));
         if (cluster[high(item)]->min == -1)
             summary->deleteItem(high(item));
-        
+
         if (item == max)
         {
             int i = summary->max;
@@ -219,33 +219,33 @@ public:
                 max = index(i, cluster[i]->max);
         }
     }
-    
+
     bool findItem(int item)
     {
         if (item == min || item == max)
             return true;
         if (item < min || item > max)
             return false;
-        
+
         return cluster[high(item)]->findItem(low(item));
-        
+
     }
-    
+
     int getMin()
     {
         return min;
     }
-    
+
     int getMax()
     {
         return max;
     }
-    
+
     int size()
     {
         return partitionSize;
     }
-    
+
 protected:
     int min = -1; // None
     int max = -1;
@@ -254,7 +254,7 @@ protected:
     vector<VEBTree*> cluster;
     VEBTree* summary;
 private:
-    
+
     int index(int i, int j)
     {
         return i * sqrt(double(partitionSize)) + j;
@@ -268,5 +268,3 @@ private:
         return int(floor(x / sqrt(double(partitionSize))));
     }
 };
-
-
