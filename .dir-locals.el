@@ -2,4 +2,4 @@
 ;;; For more information see (info "(emacs) Directory Variables")
 
 ((nil
-  (cmake-ide-compile-command . "CXX=clang++ cmake .; make")))
+  (cmake-ide-compile-command . "cmake .; make")))
