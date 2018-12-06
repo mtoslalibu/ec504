@@ -8,10 +8,12 @@
 
 #include <iostream>
 #include "vEB.hpp"
+#include "XFastTrie.hpp"
 
 int main(int argc, const char * argv[]) {
     // insert code here...
     VEBTree *v = new VEBTree(256);
+    XFastTrie *xft = new XFastTrie();
 
     for (int i=0; i<250; i = i+3) {
         v->insert(i);
