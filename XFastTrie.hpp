@@ -17,7 +17,7 @@ static vector<uint64_t> fillMasks() {
     uint64_t mask = 0;
 
     for (uint64_t i = 0; i < 64; i++) {
-        mask = mask | (1 << (63 - i));
+        mask = mask | ((uint64_t)1 << (63 - i));
         masks.push_back(mask);
     }
 
@@ -29,7 +29,7 @@ static vector<uint64_t> fillPositions() {
     vector<uint64_t> positions;
 
     for (uint64_t i = 0; i < 64; i++)
-        positions.push_back(1 << (63 - i));
+        positions.push_back((uint64_t)1 << (63 - i));
 
     return positions;
 }
@@ -72,6 +72,8 @@ Node* newNode(Node* parent, Entry* entry) {
     Node* n = new Node;
 
     n->children = vector<Node*>();
+    n->children.push_back(NULL);
+    n->children.push_back(NULL);
     n->parent = parent;
     n->entry = entry;
 
@@ -100,7 +102,7 @@ tuple<int, Node*> binarySearchHashMaps(vector<map<uint64_t, Node*>> layers, uint
     return tuple<int, Node*>(low, node);
 }
 
-int whichSide(Node* parent, Node* n) {
+int whichSide(Node* n, Node* parent) {
     if (parent->children[0] == n)
         return 0;
 
@@ -239,7 +241,7 @@ Node* XFastTrie::successor(uint64_t key) {
         return NULL;
 
     if (key <= min->entry->key)
-        return 0;
+        return min;
 
     if (key > max->entry->key)
         return NULL;
@@ -332,7 +334,7 @@ void XFastTrie::walkUpNode(Node* root, Node* node, Node* predecessor, Node* succ
 void XFastTrie::insert(Entry *entry) {
     uint64_t key = entry->key;
 
-    // it key is already present
+    // if key is already present
     auto n_iter = layers[bits - 1].find(key);
     Node* n = NULL;
     if (n_iter != layers[bits - 1].end()) {
@@ -371,15 +373,15 @@ void XFastTrie::insert(Entry *entry) {
         leftOrRight = (key & positions[diff + i]) >> (bits - 1 - i);
         if (n->children[leftOrRight] == NULL || isLeaf(n->children[leftOrRight])) {
             Node* nn;
-            if (i < bits - 1)
+            if (i < bits - 1) {
                 nn = newNode(n, NULL);
-            else
+            } else {
                 nn = newNode(n, entry);
+                num++;
+            }
 
             n->children[leftOrRight] = nn;
-            auto nn_iter = layers[i].find(key & masks[diff + i]);
-            if (nn_iter != layers[i].end())
-                nn_iter->second = nn;
+            layers[i][key & masks[diff + i]] = nn;
         }
 
         n = n->children[leftOrRight];
