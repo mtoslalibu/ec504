@@ -1,3 +1,9 @@
+/*
+
+  Rewrite of Golang's github.com/Workiva/go-datastructures/blob/master/trie/xfast/xfast.go
+
+ */
+
 #include <stdint.h>
 #include <map>
 #include <vector>
@@ -117,6 +123,7 @@ public:
     Entry* getMax() const;
     Entry* getMin() const;
     void insert(Entry*);
+    void del(uint64_t);
     Node* predecessor (uint64_t);
     Node* successor (uint64_t);
     Entry* getPredecessor(uint64_t);
@@ -357,9 +364,125 @@ void XFastTrie::insert(Entry *entry) {
         n = root;
     }
 
+    uint64_t leftOrRight;
+
     // from the existing node, create new nodes
     for (uint8_t i = layer; i < bits; i++) {
+        leftOrRight = (key & positions[diff + i]) >> (bits - 1 - i);
+        if (n->children[leftOrRight] == NULL || isLeaf(n->children[leftOrRight])) {
+            Node* nn;
+            if (i < bits - 1)
+                nn = newNode(n, NULL);
+            else
+                nn = newNode(n, entry);
 
+            n->children[leftOrRight] = nn;
+            auto nn_iter = layers[i].find(key & masks[diff + i]);
+            if (nn_iter != layers[i].end())
+                nn_iter->second = nn;
+        }
+
+        n = n->children[leftOrRight];
     }
 
+    // add new node in doubly-linked list on the leaves level
+    if (successor != NULL) {
+        predecessor = successor->children[0];
+        if (predecessor != NULL) {
+            predecessor->children[1] = n;
+            n->children[0] = predecessor;
+            // TODO: cross pointers
+        }
+        n->children[1] = successor;
+        successor->children[0] = n;
+        // TODO: cross pointers
+    } else if (predecessor != NULL) {
+        n->children[0] = predecessor;
+        predecessor->children[1] = n;
+        // TODO: cross pointers
+    }
+
+    // walk up the successor if it exists to set that branch's new
+    // predecessor
+    if (successor != NULL)
+        walkUpSuccessor(root, n, successor);
+
+    // walk up predecessor if it exists to set that branch's new
+    // successor
+    if (predecessor != NULL)
+        walkUpPredecessor(root, n, predecessor);
+
+    // finally walk up our own branch to set both successors and
+    // predecessors
+    walkUpNode(root, n, predecessor, successor);
+
+    // do the final check against the min/max indices
+    if (max == NULL || key > max->entry->key)
+        max = n;
+
+    if (min == NULL || key < min->entry->key)
+        min = n;
+}
+
+void XFastTrie::del(uint64_t key) {
+    auto n_iter = layers[bits - 1].find(key);
+    if (n_iter == layers[bits - 1].end())
+        return;
+
+    Node* n = n_iter->second;
+    Node* successor = n->children[1];
+    Node* predecessor = n->children[0];
+
+    uint8_t i = 1;
+    layers[bits - 1].erase(key);
+    int leftOrRight = whichSide(n, n->parent);
+    n->parent->children[leftOrRight] = NULL;
+    n->children[0] = NULL;
+    n->children[1] = NULL;
+    n = n->parent;
+    // TODO: cross pointers n->parent = NULL
+    bool hasImmediateSibling = false;
+    if (successor != NULL && successor->parent == n)
+        hasImmediateSibling = true;
+    if (predecessor != NULL && predecessor->parent == n)
+        hasImmediateSibling = true;
+
+    // this loop kills any nodes that no longer link to internal nodes
+    while (n != NULL && n->parent != NULL) {
+        if (hasInternal(n) || (i == 1 && hasImmediateSibling)) {
+            n = n->parent;
+            break;
+        }
+
+        leftOrRight = whichSide(n, n->parent);
+        n->parent->children[leftOrRight] = NULL;
+        // TODO: cross pointers
+        n->children[0] = NULL;
+        n->children[1] = NULL;
+        layers[bits - i - 1].erase(key & masks[masks.size() - 1 - i]);
+        n = n->parent;
+        i++;
+    }
+
+    // check and update threads in leaves and in their branhes
+    if (predecessor != NULL) {
+        predecessor->children[1] = successor;
+        // TODO: cross pointers
+        walkUpPredecessor(n, successor, predecessor);
+    }
+
+    if (successor != NULL) {
+        successor->children[0] = predecessor;
+        // TODO: cross pointers
+        walkUpSuccessor(n, predecessor, successor);
+    }
+
+    // check max/min indeces
+    if (max->entry->key == key)
+        max = predecessor;
+
+    if (min->entry->key == key)
+        min = successor;
+
+    num--;
 }
