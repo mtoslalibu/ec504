@@ -18,7 +18,7 @@ static vector<uint64_t> fillMasks() {
     return masks;
 }
 
-// In 8 bit parlance:
+// In 8-bit parlance: 10000000, 01000000, 00100000
 static vector<uint64_t> fillPositions() {
     vector<uint64_t> positions;
 
@@ -72,7 +72,7 @@ Node* newNode(Node* parent, Entry* entry) {
     return n;
 }
 
-tuple<int, Node*> bianrySearchHashMaps(vector<map<uint64_t, Node*>> layers, uint64_t key) {
+tuple<int, Node*> binarySearchHashMaps(vector<map<uint64_t, Node*>> layers, uint64_t key) {
     int low = 0;
     int high = layers.size();
     int diff = 64 - layers.size();
@@ -108,14 +108,27 @@ int whichSide(Node* parent, Node* n) {
 class XFastTrie
 {
 public:
-    XFastTrie();
-    ~XFastTrie();
+    XFastTrie(int);
+    ~XFastTrie() {};
 
-    map<uint64_t, Node*> getLayers() const;
+    bool exists(uint64_t) const;
+    vector<map<uint64_t, Node*>> getLayers() const;
+    int getLen() const;
+    Entry* getMax() const;
+    Entry* getMin() const;
+    void insert(Entry*);
+    Node* predecessor (uint64_t);
+    Node* successor (uint64_t);
+    Entry* getPredecessor(uint64_t);
+    Entry* getSuccessor(uint64_t);
+    void walkUpSuccessor(Node* root, Node* node, Node* successor);
+    void walkUpPredecessor(Node* root, Node* node, Node* predecessor);
+    void walkUpNode(Node* root, Node* node, Node* predecessor, Node* successor);
 
 private:
-    // LSS hash layers
-    map<uint64_t, Node*> layers;
+    // LSS hash layers. Will have as many those as is the length of
+    // keys + zeroth layer.
+    vector<map<uint64_t, Node*>> layers;
 
     // Root node. Introduces new layer, on the top of others.
     Node* root;
@@ -127,7 +140,226 @@ private:
     uint16_t bits, diff;
 
     // Highest and lowest seen keys
-    Node* min, max;
+    Node* min, *max;
 };
 
-XFastTrie::XFastTrie() {}
+XFastTrie::XFastTrie(int bts) {
+    switch (bts) {
+    case 8: bits = 8; break;
+    case 16: bits = 16; break;
+    case 32: bits = 16; break;
+    case 64: bits = 16; break;
+    default:
+        throw "Only 8, 16, 32, 64 key lengths are supported.";
+    }
+
+    layers = vector<map<uint64_t, Node*>>();
+    layers.reserve(bits);
+    diff = 64 - bits;
+
+    for (int i = 0; i < bits; i++)
+        layers.push_back(map<uint64_t, Node*>());
+
+    num = 0;
+    root = newNode(NULL, NULL);
+
+    min = NULL;
+    max = NULL;
+}
+
+bool XFastTrie::exists(uint64_t key) const {
+    // If key exists, it must be at the bottom layer
+    if (layers[bits - 1].find(key) == layers[bits - 1].end())
+        return false;
+
+    return true;
+}
+
+vector<map<uint64_t, Node*>> XFastTrie::getLayers() const {
+    return layers;
+}
+
+int XFastTrie::getLen() const {
+    return num;
+}
+
+Entry* XFastTrie::getMax() const {
+    if (max)
+        return max->entry;
+
+    return NULL;
+}
+
+Entry* XFastTrie::getMin() const {
+    if (min)
+        return min->entry;
+
+    return NULL;
+}
+
+// Equal to or immediately less then the provided key
+Node* XFastTrie::predecessor(uint64_t key) {
+    // No nodes, no predecessor
+    if (root == NULL || max == NULL)
+        return NULL;
+
+    if (key >= max->entry->key)
+        return max;
+
+    if (key < min->entry->key)
+        return NULL;
+
+    auto n_iter = layers[bits - 1].find(key);
+    if (n_iter != layers[bits - 1].end())
+        return n_iter->second;
+
+    auto bs = binarySearchHashMaps(layers, key);
+    int layer = get<0>(bs);
+    Node* n = get<1>(bs);
+    if (n == NULL && layer > 1)
+        return NULL;
+    else if (n == NULL)
+        n = root;
+
+    if (isInternal(n->children[0]) && isLeaf(n->children[1]))
+        return n->children[1]->children[0];
+
+    return n->children[0];
+}
+
+Node* XFastTrie::successor(uint64_t key) {
+    if (root == NULL || min == NULL)
+        return NULL;
+
+    if (key <= min->entry->key)
+        return 0;
+
+    if (key > max->entry->key)
+        return NULL;
+
+    auto n_iter = layers[bits - 1].find(key);
+    if (n_iter != layers[bits - 1].end())
+        return n_iter->second;
+
+    auto bs = binarySearchHashMaps(layers, key);
+    int layer = get<0>(bs);
+    Node* n = get<1>(bs);
+    if (n == NULL && layer > 1)
+        return NULL;
+    else if (n == NULL)
+        n = root;
+
+    if (isInternal(n->children[1]) && isLeaf(n->children[0]))
+        return n->children[0]->children[1];
+
+    return n->children[1];
+}
+
+Entry* XFastTrie::getPredecessor(uint64_t key) {
+    Node* n = predecessor(key);
+
+    if (n)
+        return n->entry;
+
+    return NULL;
+}
+
+Entry* XFastTrie::getSuccessor(uint64_t key) {
+    Node* n = successor(key);
+
+    if (n)
+        return n->entry;
+
+    return NULL;
+}
+
+void XFastTrie::walkUpSuccessor(Node* root, Node* node, Node* successor) {
+    Node* n = successor->parent;
+
+    while (n != NULL && n != root) {
+        if (!isInternal(n->children[0]) && (n->children[0] != successor)) {
+            n->children[0] = node;
+            // TODO: maybe this?
+            // node->parent = n;
+        }
+
+        n = n->parent;
+    }
+}
+
+void XFastTrie::walkUpPredecessor(Node* root, Node* node, Node* predecessor) {
+    Node* n = predecessor->parent;
+
+    while (n != NULL && n != root) {
+        if (!isInternal(n->children[1]) && (n->children[1] != predecessor)) {
+            n->children[1] = node;
+            // TODO: maybe this?
+            // node->parent = n;
+        }
+
+        n = n->parent;
+    }
+}
+
+void XFastTrie::walkUpNode(Node* root, Node* node, Node* predecessor, Node* successor) {
+    Node* n = node->parent;
+
+    while (n != NULL && n != root) {
+        if (!isInternal(n->children[1]) && n->children[1] != successor && n->children[1] != node) {
+            n->children[1] = successor;
+            // TODO: maybe this?
+            // successor->parent = n->children[1];
+        }
+
+        if (!isInternal(n->children[0]) && n->children[0] != predecessor && n->children[0] != node) {
+            n->children[0] = successor;
+            // TODO: maybe this?
+            // successor->parent = n->children[1];
+        }
+
+        n = n->parent;
+    }
+}
+
+// Inserts new or overwrite if it already exists
+void XFastTrie::insert(Entry *entry) {
+    uint64_t key = entry->key;
+
+    // it key is already present
+    auto n_iter = layers[bits - 1].find(key);
+    Node* n = NULL;
+    if (n_iter != layers[bits - 1].end()) {
+        n_iter->second->entry = entry;
+        return;
+    }
+
+    Node *predecessor = NULL, *successor = NULL;
+    if (min != NULL && key < min->entry->key)
+        successor = min;
+    else
+        successor = XFastTrie::successor(key);
+
+    if (successor == NULL) {
+        if (max != NULL && key > max->entry->key)
+            predecessor = max;
+        else
+            predecessor = XFastTrie::predecessor(key);
+    }
+
+    // find the deepest root with a matching prefix
+    auto bs = binarySearchHashMaps(layers, key);
+    int layer = get<0>(bs);
+    Node* root = get<1>(bs);
+    if (root == NULL) {
+        n = root;
+        layer = 0;
+    } else {
+        n = root;
+    }
+
+    // from the existing node, create new nodes
+    for (uint8_t i = layer; i < bits; i++) {
+
+    }
+
+}

@@ -10,12 +10,14 @@
 #include "vEB.hpp"
 #include "XFastTrie.hpp"
 #include <vector>
+#include <map>
 
 int main(int argc, const char * argv[]) {
     // insert code here...
     VEBTree *v = new VEBTree(256);
 
-    XFastTrie *xft = new XFastTrie();
+    XFastTrie xft(8);
+    printf("Len of layers: %lu\n", xft.getLayers().size());
 
     Entry e = {5};
     vector<Node*> ch_n;
@@ -42,9 +44,32 @@ int main(int argc, const char * argv[]) {
     cout << "entry: " << nne.key << " parents child entry: ";
     printf("%lu\n", nnode->parent->children[0]->entry->key);
 
-    for (int i=0; i<250; i = i+3) {
-        v->insert(i);
-    }
+    // printf("mask size: %lu\n", masks.size());
+    // for (size_t i = 0; i < masks.size(); i++) {
+    //     printf("%u ", masks[i]);
+    // }
+    // printf("Done\n");
+
+    // for (int i=0; i<250; i = i+3) {
+    //     v->insert(i);
+    // }
+
+    vector<map<int, int>> veco;
+    map<int, int> mapo;
+    veco.push_back(mapo);
+
+    if (veco[0].find(2) == veco[0].end())
+        cout << "Cannot find the key" << endl;
+
+    map<char, int> mapa;
+    mapa['a'] = 928;
+    mapa['b'] = 2;
+    map<char, int>::iterator record1 = mapa.find('a');
+    map<char, int>::iterator record2 = mapa.find('c');
+    if (record1 == mapa.end())
+        cout << "record1 is end" << endl;
+    if (record2 == mapa.end())
+        cout << "record2 is end" << endl;
 
     printf("%d\n", v -> getMax());
     printf("%d\n", v -> getMin());
