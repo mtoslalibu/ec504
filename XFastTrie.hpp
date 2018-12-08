@@ -127,6 +127,7 @@ public:
     Entry* getMin() const;
     void insert(Entry*);
     void del(uint64_t);
+    bool lookup(uint64_t key);
     Node* predecessor (uint64_t);
     Node* successor (uint64_t);
     Entry* getPredecessor(uint64_t);
@@ -490,4 +491,12 @@ void XFastTrie::del(uint64_t key) {
         min = successor;
 
     num--;
+}
+
+bool XFastTrie::lookup(uint64_t key) {
+    auto iter = layers[bits - 1].find(key);
+    if (iter == layers[bits - 1].end())
+        return false;
+
+    return true;
 }

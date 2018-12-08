@@ -43,7 +43,7 @@ func main() {
 	// e7 := entry{9}
 	// e8 := entry{34}
 
-	xft := xfast.New(int(4))
+	xft := xfast.New(uint8(8))
 	fmt.Printf("len is %d\n", xft.Len())
 	xft.Insert(e)
 	xft.Insert(e1)
@@ -52,7 +52,7 @@ func main() {
 	xft.Insert(e4)
 	xft.Insert(e5)
 
-	fmt.Printf("Pred 9: %d\n", xft.Predecessor(9));
+	fmt.Printf("Pred 9: %d\n", xft.Predecessor(9))
 	// xft.Insert(e6)
 	// xft.Insert(e7)
 	// xft.Insert(e8)
