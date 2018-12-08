@@ -285,13 +285,9 @@ Entry* XFastTrie::getSuccessor(uint64_t key) {
 }
 
 void XFastTrie::walkUpSuccessor(Node* root, Node* node, Node* successor) {
-    cout << "Called Walk " << node->entry->key << " " << successor->entry->key << endl;
     Node* n = successor->parent;
 
-    int i = 0;
     while (n != NULL && n != root) {
-        cout << "# " << i++ << endl;
-
         if (!isInternal(n->children[0]) && (n->children[0] != successor)) {
             n->children[0] = node;
             // TODO: maybe this?
@@ -300,8 +296,6 @@ void XFastTrie::walkUpSuccessor(Node* root, Node* node, Node* successor) {
 
         n = n->parent;
     }
-
-    printf("WalkUpS End\n");
 }
 
 void XFastTrie::walkUpPredecessor(Node* root, Node* node, Node* predecessor) {
@@ -433,12 +427,6 @@ void XFastTrie::insert(Entry *entry) {
 
     if (min == NULL || key < min->entry->key)
         min = n;
-
-    if (key == 11) {
-        cout << "n->entry->key: " << n->entry->key << endl;
-        printf("n->parent->children[0]: %p\n", n->parent->children[0]);
-        printf("n->parent->parent->children[0]: %p\n", n->parent->parent->children[0]);
-    }
 }
 
 void XFastTrie::del(uint64_t key) {
