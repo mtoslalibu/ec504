@@ -83,7 +83,7 @@ Node* newNode(Node* parent, Entry* entry) {
 
 pair<int, Node*> binarySearchHashMaps(vector<map<uint64_t, Node*>> layers, uint64_t key) {
     int low = 0;
-    int high = layers.size();
+    int high = layers.size() - 1;
     int diff = 64 - layers.size();
     int mid;
     Node* node = NULL;
@@ -147,7 +147,7 @@ private:
     uint64_t num;
 
     // Number of bits of the keys and its difference with 64
-    uint16_t bits, diff;
+    uint64_t bits, diff;
 
     // Highest and lowest seen keys
     Node* min, *max;
@@ -155,10 +155,11 @@ private:
 
 XFastTrie::XFastTrie(int bts) {
     switch (bts) {
+    case 4: bits = 4; break;
     case 8: bits = 8; break;
     case 16: bits = 16; break;
-    case 32: bits = 16; break;
-    case 64: bits = 16; break;
+    case 32: bits = 32; break;
+    case 64: bits = 64; break;
     default:
         throw "Only 8, 16, 32, 64 key lengths are supported.";
     }
@@ -288,7 +289,7 @@ void XFastTrie::walkUpSuccessor(Node* root, Node* node, Node* successor) {
     Node* n = successor->parent;
 
     int i = 0;
-    while (n != NULL && n != root && n->children.size() != 0) {
+    while (n != NULL && n != root) {
         cout << "# " << i++ << endl;
 
         if (!isInternal(n->children[0]) && (n->children[0] != successor)) {
@@ -328,7 +329,7 @@ void XFastTrie::walkUpNode(Node* root, Node* node, Node* predecessor, Node* succ
         }
 
         if (!isInternal(n->children[0]) && n->children[0] != predecessor && n->children[0] != node) {
-            n->children[0] = successor;
+            n->children[0] = predecessor;
             // TODO: maybe this?
             // successor->parent = n->children[1];
         }
@@ -349,7 +350,8 @@ void XFastTrie::insert(Entry *entry) {
         return;
     }
 
-    Node *predecessor = NULL, *successor = NULL;
+    Node* predecessor = NULL;
+    Node* successor = NULL;
     if (min != NULL && key < min->entry->key)
         successor = min;
     else
@@ -365,12 +367,12 @@ void XFastTrie::insert(Entry *entry) {
     // find the deepest root with a matching prefix
     auto bs = binarySearchHashMaps(layers, key);
     int layer = bs.first;
-    Node* root = bs.second;
-    if (root == NULL) {
-        n = this->root;
+    Node* sub_root = bs.second;
+    if (sub_root == NULL) {
+        n = root;
         layer = 0;
     } else {
-        n = root;
+        n = sub_root;
     }
 
     uint64_t leftOrRight;
@@ -379,7 +381,7 @@ void XFastTrie::insert(Entry *entry) {
     for (uint8_t i = layer; i < bits; i++) {
         leftOrRight = (key & positions[diff + i]) >> (bits - 1 - i);
         if (n->children[leftOrRight] == NULL || isLeaf(n->children[leftOrRight])) {
-            Node* nn;
+            Node* nn = NULL;
             if (i < bits - 1) {
                 nn = newNode(n, NULL);
             } else {
@@ -414,16 +416,16 @@ void XFastTrie::insert(Entry *entry) {
     // walk up the successor if it exists to set that branch's new
     // predecessor
     if (successor != NULL)
-        walkUpSuccessor(root, n, successor);
+        walkUpSuccessor(sub_root, n, successor);
 
     // walk up predecessor if it exists to set that branch's new
     // successor
     if (predecessor != NULL)
-        walkUpPredecessor(root, n, predecessor);
+        walkUpPredecessor(sub_root, n, predecessor);
 
     // finally walk up our own branch to set both successors and
     // predecessors
-    walkUpNode(root, n, predecessor, successor);
+    walkUpNode(sub_root, n, predecessor, successor);
 
     // do the final check against the min/max indices
     if (max == NULL || key > max->entry->key)
@@ -431,6 +433,12 @@ void XFastTrie::insert(Entry *entry) {
 
     if (min == NULL || key < min->entry->key)
         min = n;
+
+    if (key == 11) {
+        cout << "n->entry->key: " << n->entry->key << endl;
+        printf("n->parent->children[0]: %p\n", n->parent->children[0]);
+        printf("n->parent->parent->children[0]: %p\n", n->parent->parent->children[0]);
+    }
 }
 
 void XFastTrie::del(uint64_t key) {
@@ -468,7 +476,7 @@ void XFastTrie::del(uint64_t key) {
         // TODO: cross pointers
         n->children[0] = NULL;
         n->children[1] = NULL;
-        layers[bits - i - 1].erase(key & masks[masks.size() - 1 - i]);
+        layers[bits - i - 1].erase(key & masks[masks.size() - 1 - (int)i]);
         n = n->parent;
         i++;
     }

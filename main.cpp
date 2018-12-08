@@ -21,7 +21,24 @@ int main(int argc, const char * argv[]) {
     // insert code here...
     VEBTree *v = new VEBTree(8);
 
-    XFastTrie xft(64);
+    XFastTrie xft(4);
+
+    Entry e0 = {2};
+    xft.insert(&e0);
+    Entry e1 = {3};
+    xft.insert(&e1);
+    Entry e2 = {5};
+    xft.insert(&e2);
+    Entry e3 = {7};
+    xft.insert(&e3);
+    Entry e4 = {11};
+    xft.insert(&e4);
+    Entry e5 = {13};
+    xft.insert(&e5);
+
+    cout << "Predecessor 9: " << xft.getPredecessor((uint64_t) 9)->key << endl;
+    // cout << xft.getSuccessor((uint64_t) 4)->key << endl;
+
     printf("Len of layers: %lu\n", xft.getLayers().size());
     // for (int i = 0; i < 64; i++)
     //     printf("0x%" PRIx64 "\n", masks[i]);
@@ -53,24 +70,24 @@ int main(int argc, const char * argv[]) {
     // auto ret = foo();
     // cout << "first: " << ret.first << " second: " << ret.second;
 
-    Entry e = {5};
-    xft.insert(&e);
-    Entry e1 = {6};
-    xft.insert(&e1);
-    Entry e2 = {6};
-    xft.insert(&e2);
-    Entry e3 = {4};
-    xft.insert(&e3);
-    Entry e4 = {8};
-    xft.insert(&e4);
-    Entry e33 = {12};
-    xft.insert(&e33);
-    Entry e44 = {13};
-    xft.insert(&e44);
-    Entry e331 = {9};
-    xft.insert(&e331);
-    Entry e441 = {34};
-    xft.insert(&e441);
+    // Entry e = {5};
+    // xft.insert(&e);
+    // Entry e1 = {6};
+    // xft.insert(&e1);
+    // Entry e2 = {6};
+    // xft.insert(&e2);
+    // Entry e3 = {4};
+    // xft.insert(&e3);
+    // Entry e4 = {8};
+    // xft.insert(&e4);
+    // Entry e33 = {12};
+    // xft.insert(&e33);
+    // Entry e44 = {13};
+    // xft.insert(&e44);
+    // Entry e331 = {9};
+    // xft.insert(&e331);
+    // Entry e441 = {34};
+    // xft.insert(&e441);
 
     // Entry entries[100];
     // for (int i = 0; i < 100; i++) {
@@ -91,10 +108,10 @@ int main(int argc, const char * argv[]) {
     // printf("Succ7: %lu Pred7: %lu\n", suc_7->key, pred_7->key);
 
     // cout << "Should delete " << endl;
-    xft.del((uint64_t) 6);
-    xft.del((uint64_t) 9);
-    xft.del((uint64_t) 12);
-    xft.del((uint64_t) 12);
+    // xft.del((uint64_t) 6);
+    // xft.del((uint64_t) 9);
+    // xft.del((uint64_t) 12);
+    // xft.del((uint64_t) 13);
 
     // vector<Node*> ch_n;
     // ch_n.push_back(NULL);
@@ -126,9 +143,9 @@ int main(int argc, const char * argv[]) {
     // }
     // printf("Done\n");
 
-    for (int i=0; i<250; i = i+3) {
-        v->insert(i);
-    }
+    // for (int i=0; i<250; i = i+3) {
+    //     v->insert(i);
+    // }
 
     // vector<map<int, int>> veco;
     // map<int, int> mapo;
@@ -147,11 +164,11 @@ int main(int argc, const char * argv[]) {
     // if (record2 == mapa.end())
     //     cout << "record2 is end" << endl;
 
-    printf("%d\n", v -> getMax());
-    printf("%d\n", v -> getMin());
-    printf("%d\n", (v -> successor(9)));
-    printf("%d\n", (v -> predecessor(9)));
-    printf(v->findItem(9)?"found\n":"not found\n");
+    // printf("%d\n", v -> getMax());
+    // printf("%d\n", v -> getMin());
+    // printf("%d\n", (v -> successor(9)));
+    // printf("%d\n", (v -> predecessor(9)));
+    // printf(v->findItem(9)?"found\n":"not found\n");
 
     return 0;
 }
