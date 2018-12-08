@@ -13,11 +13,15 @@
 #include <map>
 #include "inttypes.h"
 
+pair<int, char> foo() {
+    return make_pair(1, 'c');
+}
+
 int main(int argc, const char * argv[]) {
     // insert code here...
-    VEBTree *v = new VEBTree(256);
+    VEBTree *v = new VEBTree(8);
 
-    XFastTrie xft(8);
+    XFastTrie xft(64);
     printf("Len of layers: %lu\n", xft.getLayers().size());
     // for (int i = 0; i < 64; i++)
     //     printf("0x%" PRIx64 "\n", masks[i]);
@@ -33,6 +37,22 @@ int main(int argc, const char * argv[]) {
     // mmap['b'] = 33;
     // printf("mmap a, b: %d, %d\n", mmap['a'], mmap['b']);
 
+    // vector<int*> vec = vector<int*>();
+    // int one = 1;
+    // int two = 2;
+    // int three = 3;
+    // vec.push_back(NULL);
+    // vec.push_back(NULL);
+    // vec[0] = &one;
+    // vec[1] = &two;
+    // vec[0] = &three;
+    // vec[1] = &three;
+    // vec[100] = &one;
+    // cout << "Size is: " << vec.size() << endl;
+
+    // auto ret = foo();
+    // cout << "first: " << ret.first << " second: " << ret.second;
+
     Entry e = {5};
     xft.insert(&e);
     Entry e1 = {6};
@@ -43,18 +63,38 @@ int main(int argc, const char * argv[]) {
     xft.insert(&e3);
     Entry e4 = {8};
     xft.insert(&e4);
-    printf("Max: %lu\n", xft.getMax()->key);
-    printf("Min: %lu\n", xft.getMin()->key);
-    printf("Len: %d\n", xft.getLen());
-    Entry* suc_5 = xft.getSuccessor((uint64_t)5);
-    Entry* suc_7 = xft.getSuccessor((uint64_t)7);
-    Entry* pred_7 = xft.getPredecessor((uint64_t)7);
-    Entry* pred_6 = xft.getPredecessor((uint64_t)6);
-    printf("Suc5: %lu\n", suc_5->key);
-    printf("Pred6: %lu\n", pred_6->key);
-    printf("Succ7: %lu Pred7: %lu\n", suc_7->key, pred_7->key);
+    Entry e33 = {12};
+    xft.insert(&e33);
+    Entry e44 = {13};
+    xft.insert(&e44);
+    Entry e331 = {9};
+    xft.insert(&e331);
+    Entry e441 = {34};
+    xft.insert(&e441);
 
+    // Entry entries[100];
+    // for (int i = 0; i < 100; i++) {
+    //     cout << "insert " << i << endl;
+    //     entries[i].key = i;
+    //     xft.insert(&entries[i]);
+    // }
+
+    // printf("Max: %lu\n", xft.getMax()->key);
+    // printf("Min: %lu\n", xft.getMin()->key);
+    // printf("Len: %d\n", xft.getLen());
+    // Entry* suc_5 = xft.getSuccessor((uint64_t)5);
+    // Entry* suc_7 = xft.getSuccessor((uint64_t)7);
+    // Entry* pred_7 = xft.getPredecessor((uint64_t)7);
+    // Entry* pred_6 = xft.getPredecessor((uint64_t)6);
+    // printf("Suc5: %lu\n", suc_5->key);
+    // printf("Pred6: %lu\n", pred_6->key);
+    // printf("Succ7: %lu Pred7: %lu\n", suc_7->key, pred_7->key);
+
+    // cout << "Should delete " << endl;
     xft.del((uint64_t) 6);
+    xft.del((uint64_t) 9);
+    xft.del((uint64_t) 12);
+    xft.del((uint64_t) 12);
 
     // vector<Node*> ch_n;
     // ch_n.push_back(NULL);
@@ -80,15 +120,15 @@ int main(int argc, const char * argv[]) {
     // cout << "entry: " << nne.key << " parents child entry: ";
     // printf("%lu\n", nnode->parent->children[0]->entry->key);
 
-    // // printf("mask size: %lu\n", masks.size());
-    // // for (size_t i = 0; i < masks.size(); i++) {
-    // //     printf("%u ", masks[i]);
-    // // }
-    // // printf("Done\n");
+    // printf("mask size: %lu\n", masks.size());
+    // for (size_t i = 0; i < masks.size(); i++) {
+    //     printf("%u ", masks[i]);
+    // }
+    // printf("Done\n");
 
-    // // for (int i=0; i<250; i = i+3) {
-    // //     v->insert(i);
-    // // }
+    for (int i=0; i<250; i = i+3) {
+        v->insert(i);
+    }
 
     // vector<map<int, int>> veco;
     // map<int, int> mapo;

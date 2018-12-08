@@ -12,7 +12,7 @@ func (d entry) Key() uint64 {
 }
 
 func main() {
-	fmt.Println("Hello world!")
+	// fmt.Println("Hello world!")
 
 	// masks := [64]uint64{}
 	// mask := uint64(0)
@@ -37,20 +37,30 @@ func main() {
 	e1 := entry{6}
 	e2 := entry{6}
 	e3 := entry{4}
+	e4 := entry{8}
+	e5 := entry{12}
+	e6 := entry{13}
+	e7 := entry{9}
+	e8 := entry{34}
 
 	xft := xfast.New(uint8(8))
 	xft.Insert(e)
 	xft.Insert(e1)
 	xft.Insert(e2)
 	xft.Insert(e3)
+	xft.Insert(e4)
+	xft.Insert(e5)
+	xft.Insert(e6)
+	xft.Insert(e7)
+	xft.Insert(e8)
 
-	for i := 0; i < 100; i++ {
-		e := entry{uint64(i)}
-		xft.Insert(e)
-	}
+	// for i := 0; i < 100; i++ {
+	// 	e := entry{uint64(i)}
+	// 	xft.Insert(e)
+	// }
 
 	fmt.Printf("len is %d\n", xft.Len())
-	xft.Delete(uint64(4))
-	fmt.Printf("Succ: %d\n", xft.Successor(uint64(4)).Key())
+	// xft.Delete(uint64(4))
+	// fmt.Printf("Succ: %d\n", xft.Successor(uint64(4)).Key())
 
 }

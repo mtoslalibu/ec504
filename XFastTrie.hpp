@@ -8,6 +8,7 @@
 #include <map>
 #include <vector>
 #include <tuple>
+#include <iostream>
 
 using namespace std;
 
@@ -80,12 +81,12 @@ Node* newNode(Node* parent, Entry* entry) {
     return n;
 }
 
-tuple<int, Node*> binarySearchHashMaps(vector<map<uint64_t, Node*>> layers, uint64_t key) {
+pair<int, Node*> binarySearchHashMaps(vector<map<uint64_t, Node*>> layers, uint64_t key) {
     int low = 0;
     int high = layers.size();
     int diff = 64 - layers.size();
     int mid;
-    Node* node;
+    Node* node = NULL;
 
     while (low <= high) {
         mid = (low + high) / 2;
@@ -99,7 +100,7 @@ tuple<int, Node*> binarySearchHashMaps(vector<map<uint64_t, Node*>> layers, uint
         }
     }
 
-    return tuple<int, Node*>(low, node);
+    return make_pair(low, node);
 }
 
 int whichSide(Node* n, Node* parent) {
@@ -223,8 +224,8 @@ Node* XFastTrie::predecessor(uint64_t key) {
         return n_iter->second;
 
     auto bs = binarySearchHashMaps(layers, key);
-    int layer = get<0>(bs);
-    Node* n = get<1>(bs);
+    int layer = bs.first;
+    Node* n = bs.second;
     if (n == NULL && layer > 1)
         return NULL;
     else if (n == NULL)
@@ -251,8 +252,8 @@ Node* XFastTrie::successor(uint64_t key) {
         return n_iter->second;
 
     auto bs = binarySearchHashMaps(layers, key);
-    int layer = get<0>(bs);
-    Node* n = get<1>(bs);
+    int layer = bs.first;
+    Node* n = bs.second;
     if (n == NULL && layer > 1)
         return NULL;
     else if (n == NULL)
@@ -283,9 +284,13 @@ Entry* XFastTrie::getSuccessor(uint64_t key) {
 }
 
 void XFastTrie::walkUpSuccessor(Node* root, Node* node, Node* successor) {
+    cout << "Called Walk " << node->entry->key << " " << successor->entry->key << endl;
     Node* n = successor->parent;
 
-    while (n != NULL && n != root) {
+    int i = 0;
+    while (n != NULL && n != root && n->children.size() != 0) {
+        cout << "# " << i++ << endl;
+
         if (!isInternal(n->children[0]) && (n->children[0] != successor)) {
             n->children[0] = node;
             // TODO: maybe this?
@@ -294,6 +299,8 @@ void XFastTrie::walkUpSuccessor(Node* root, Node* node, Node* successor) {
 
         n = n->parent;
     }
+
+    printf("WalkUpS End\n");
 }
 
 void XFastTrie::walkUpPredecessor(Node* root, Node* node, Node* predecessor) {
@@ -357,10 +364,10 @@ void XFastTrie::insert(Entry *entry) {
 
     // find the deepest root with a matching prefix
     auto bs = binarySearchHashMaps(layers, key);
-    int layer = get<0>(bs);
-    Node* root = get<1>(bs);
+    int layer = bs.first;
+    Node* root = bs.second;
     if (root == NULL) {
-        n = root;
+        n = this->root;
         layer = 0;
     } else {
         n = root;
@@ -466,7 +473,7 @@ void XFastTrie::del(uint64_t key) {
         i++;
     }
 
-    // check and update threads in leaves and in their branhes
+    // check and update threads in leaves and in their branches
     if (predecessor != NULL) {
         predecessor->children[1] = successor;
         // TODO: cross pointers
