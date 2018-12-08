@@ -1,8 +1,8 @@
 /*
 
-  Rewrite of Golang's github.com/Workiva/go-datastructures/blob/master/trie/xfast/xfast.go
+  Beliz Kaleli, Mert Toslali and Novak Boskov
 
- */
+*/
 
 #include <stdint.h>
 #include <map>

@@ -1,3 +1,9 @@
+/*
+
+  Beliz Kaleli, Mert Toslali and Novak Boskov
+
+*/
+
 #pragma once
 #include <cmath>
 #include <vector>
