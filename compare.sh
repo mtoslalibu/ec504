@@ -29,3 +29,6 @@ echo $'=========================================================================
 echo $'\nRun program:'
 rm stat.txt 2> /dev/null
 ./main
+
+echo $'\nRun visualization.'
+python viz.py

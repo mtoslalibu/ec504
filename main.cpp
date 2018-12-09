@@ -105,6 +105,102 @@ int main(int argc, char* argv[]) {
         fprintf(f, "%f ", (double) (clock() - t) / CLOCKS_PER_SEC);
     }
 
+    // --------------------------------------------------------------------------------
+    // vEB(256)
+    // --------------------------------------------------------------------------------
+
+    VEBTree *v256 = new VEBTree(256);
+
+    cout << "inserts for vEB(256)" << endl;
+    fprintf(f, "\nvEB(256) insert\n");
+    for (int i = 0; i < pow(2, 8); i += 2) {
+        time_t t = clock();
+        v256->insert(i);
+        fprintf(f, "%f ", (double) (clock() - t) / CLOCKS_PER_SEC);
+    }
+
+    cout << "lookup from vEB(256)" << endl;
+    fprintf(f, "\nvEB(256) lookup\n");
+    for (int i = 0; i < pow(2, 8); i += 2) {
+        time_t t = clock();
+        v256->findItem(i);
+        fprintf(f, "%f ", (double) (clock() - t) / CLOCKS_PER_SEC);
+    }
+
+    cout << "predecessor for vEB(256)" << endl;
+    fprintf(f, "\nvEB(256) predecessor\n");
+    for (int i = 1; i < pow(2, 8) - 1; i += 2) {
+        time_t t = clock();
+        v256->predecessor(i);
+        fprintf(f, "%f ", (double) (clock() - t) / CLOCKS_PER_SEC);
+    }
+
+    cout << "successor for vEB(256)" << endl;
+    fprintf(f, "\nvEB(256) successor\n");
+    for (int i = 1; i < pow(2, 8) - 1; i += 2) {
+        time_t t = clock();
+        v256->successor(i);
+        fprintf(f, "%f ", (double) (clock() - t) / CLOCKS_PER_SEC);
+    }
+
+    cout << "deletes from vEB(256))" << endl;
+    fprintf(f, "\nvEB(256) delete\n");
+    for (int i = 0; i < pow(2, 8); i += 2) {
+        time_t t = clock();
+        v256->deleteItem(i);
+        fprintf(f, "%f ", (double) (clock() - t) / CLOCKS_PER_SEC);
+    }
+
+    delete(v256);
+
+    // --------------------------------------------------------------------------------
+    // vEB(512)
+    // --------------------------------------------------------------------------------
+
+    VEBTree* v512 = new VEBTree(512);
+
+    cout << "inserts for vEB(512)" << endl;
+    fprintf(f, "\nvEB(512) insert\n");
+    for (int i = 0; i < pow(2, 16) / 8; i += 2) {
+        time_t t = clock();
+        v512->insert(i);
+        fprintf(f, "%f ", (double) (clock() - t) / CLOCKS_PER_SEC);
+    }
+
+    cout << "lookup from vEB(512)" << endl;
+    fprintf(f, "\nvEB(512) lookup\n");
+    for (int i = 0; i < pow(2, 16); i += 2) {
+        time_t t = clock();
+        v512->findItem(i);
+        fprintf(f, "%f ", (double) (clock() - t) / CLOCKS_PER_SEC);
+    }
+
+    cout << "predecessor for vEB(512)" << endl;
+    fprintf(f, "\nvEB(512) predecessor\n");
+    for (int i = 1; i < (pow(2, 16) - 1) / 8; i += 2) {
+        time_t t = clock();
+        v512->predecessor(i);
+        fprintf(f, "%f ", (double) (clock() - t) / CLOCKS_PER_SEC);
+    }
+
+    cout << "successor for vEB(512)" << endl;
+    fprintf(f, "\nvEB(512) successor\n");
+    for (int i = 1; i < (pow(2, 16) - 1) / 8; i += 2) {
+        time_t t = clock();
+        v512->successor(i);
+        fprintf(f, "%f ", (double) (clock() - t) / CLOCKS_PER_SEC);
+    }
+
+    cout << "deletes from vEB(512)" << endl;
+    fprintf(f, "\nvEB(512) delete\n");
+    for (int i = 0; i < pow(2, 16) / 8; i += 2) {
+        time_t t = clock();
+        v512->deleteItem(i);
+        fprintf(f, "%f ", (double) (clock() - t) / CLOCKS_PER_SEC);
+    }
+
+    delete(v512);
+
     fclose(f);
 
     return 0;
