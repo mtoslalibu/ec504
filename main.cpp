@@ -1,142 +1,111 @@
-//
-//  main.cpp
-//  vEBZack
-//
-//  Created by Mert TOSLALI on 12/4/18.
-//  Copyright © 2018 Mert TOSLALI. All rights reserved.
-//
-
-#include <iostream>
+#include <vector>
+#include <math.h>
+#include <time.h>
 #include "vEB.hpp"
 #include "XFastTrie.hpp"
-#include <vector>
-#include <map>
-#include "inttypes.h"
-#include <time.h>
-#include <math.h>
 
-pair<int, char> foo() {
-    return make_pair(1, 'c');
-}
+int main(int argc, char* argv[]) {
+    FILE* f = fopen("stat.txt", "a+");
 
-int main(int argc, const char * argv[]) {
-    // insert code here...
-    VEBTree *v = new VEBTree(512);
+    XFastTrie xft8 = XFastTrie(8);
+    XFastTrie xft16 = XFastTrie(16);
 
-    XFastTrie xft(8);
-
-    FILE* f = fopen("results.txt", "a+");
-    time_t t;
-    time_t timesVEB[(int)pow(2, 16) - 1];
-    time_t timesXF[(int)pow(2, 8) - 1];
-    for (int i = 0; i < pow(2, 8); i += 2) {
-        Entry* e = new Entry;
-        e->key = i;
-        t = clock();
-        xft.insert(e);
-        timesXF[i] = (double)(clock() - t) / CLOCKS_PER_SEC;
-        cout << i << endl;
+    // allocate space for the data in XFastTrie
+    vector<Entry*> entries;
+    for (unsigned long i = 0; i < pow(2, 16); i++) {
+        Entry* e = new Entry{i};
+        entries.push_back(e);
     }
 
-    // Entry e4 = {0};
-    // xft.insert(&e4);
-    // Entry e33 = {2};
-    // xft.insert(&e33);
-    // Entry e44 = {4};
-    // xft.insert(&e44);
+    // --------------------------------------------------------------------------------
+    // XFastTrie(8)
+    // --------------------------------------------------------------------------------
 
-    cout << "Pred " << xft.getPredecessor((uint64_t) 4)->key << endl;
-    cout << "Succ " << xft.getSuccessor((uint64_t) 3)->key << endl;
-    cout << "Pred " << xft.getPredecessor((uint64_t) 3)->key << endl;
-    cout << "Pred " << xft.getPredecessor((uint64_t) 1)->key << endl;
+    cout << "inserts for XFastTrie(8)" << endl;
+    fprintf(f, "XFastTrie(8) insert\n");
+    for (int i = 0; i < pow(2, 8); i += 2) {
+        time_t t = clock();
+        xft8.insert(entries[i]);
+        fprintf(f, "%f ", (double) (clock() - t) / CLOCKS_PER_SEC);
+    }
 
-    cout << "Is 4 here: " << xft.lookup(4) << endl;
-    cout << "Is 3 here: " << xft.lookup(3) << endl;
+    cout << "lookup from XFastTrie(8)" << endl;
+    fprintf(f, "\nXFastTrie(8) lookup\n");
+    for (int i = 0; i < pow(2, 8); i += 2) {
+        time_t t = clock();
+        xft8.lookup((uint64_t) i);
+        fprintf(f, "%f ", (double) (clock() - t) / CLOCKS_PER_SEC);
+    }
 
-    // cout << "Now goes VEB" << endl;
+    cout << "predecessor for XFastTrie(8)" << endl;
+    fprintf(f, "\nXFastTrie(8) predecessor\n");
+    for (int i = 1; i < pow(2, 8) - 1; i += 2) {
+        time_t t = clock();
+        xft8.getPredecessor((uint64_t) i);
+        fprintf(f, "%f ", (double) (clock() - t) / CLOCKS_PER_SEC);
+    }
 
-    // for (int i = 0; i < pow(2, 16); i++) {
-    //     t = clock();
-    //     v->insert(i);
-    //     timesVEB[i] = (double)(clock() - t) / CLOCKS_PER_SEC;
-    // }
-    // fclose(f);
+    cout << "successor for XFastTrie(8)" << endl;
+    fprintf(f, "\nXFastTrie(8) successor\n");
+    for (int i = 1; i < pow(2, 8) - 1; i += 2) {
+        time_t t = clock();
+        xft8.getSuccessor((uint64_t) i);
+        fprintf(f, "%f ", (double) (clock() - t) / CLOCKS_PER_SEC);
+    }
 
-    // Entry e4 = {8};
-    // xft.insert(&e4);
-    // Entry e33 = {12};
-    // xft.insert(&e33);
-    // Entry e44 = {13};
-    // Entry e = {5};
-    // xft.insert(&e);
-    // Entry e1 = {6};
-    // xft.insert(&e1);
-    // Entry e2 = {6};
-    // xft.insert(&e2);
-    // Entry e3 = {4};
-    // xft.insert(&e3);
-    // xft.insert(&e44);
-    // Entry e331 = {9};
-    // xft.insert(&e331);
-    // Entry e441 = {34};
-    // xft.insert(&e441);
+    cout << "deletes from XFastTrie(8)" << endl;
+    fprintf(f, "\nXFastTrie(8) delete\n");
+    for (int i = 0; i < pow(2, 8); i += 2) {
+        time_t t = clock();
+        xft8.del(i);
+        fprintf(f, "%f ", (double) (clock() - t) / CLOCKS_PER_SEC);
+    }
 
-    // xft.del((uint64_t) 6);
+    // --------------------------------------------------------------------------------
+    // XFastTrie(16)
+    // --------------------------------------------------------------------------------
 
-    // Entry e0 = {2};
-    // xft.insert(&e0);
-    // Entry e333 = {7};
-    // xft.insert(&e333);
-    // Entry e444 = {11};
-    // xft.insert(&e444);
-    // Entry e55 = {13};
-    // xft.insert(&e55);
-    // Entry e11 = {3};
-    // xft.insert(&e11);
-    // Entry e22 = {5};
-    // xft.insert(&e22);
+    cout << "inserts for XFastTrie(16)" << endl;
+    fprintf(f, "\nXFastTrie(16) insert\n");
+    for (int i = 0; i < pow(2, 16) / 8; i += 2) {
+        time_t t = clock();
+        xft16.insert(entries[i]);
+        fprintf(f, "%f ", (double) (clock() - t) / CLOCKS_PER_SEC);
+    }
 
-    // cout << "Predecessor 9: " << xft.getPredecessor((uint64_t) 9)->key << endl;
-    // cout << xft.getSuccessor((uint64_t) 4)->key << endl;
+    cout << "lookup from XFastTrie(16)" << endl;
+    fprintf(f, "\nXFastTrie(16) lookup\n");
+    for (int i = 0; i < pow(2, 16); i += 2) {
+        time_t t = clock();
+        xft16.lookup((uint64_t) i);
+        fprintf(f, "%f ", (double) (clock() - t) / CLOCKS_PER_SEC);
+    }
 
-    // Entry entries[240];
-    // for (int i = 0; i < 240; i++) {
-    //     // cout << "insert " << i << endl;
-    //     entries[i].key = i;
-    //     xft.insert(&entries[i]);
-    // }
+    cout << "predecessor for XFastTrie(16)" << endl;
+    fprintf(f, "\nXFastTrie(16) predecessor\n");
+    for (int i = 1; i < (pow(2, 16) - 1) / 8; i += 2) {
+        time_t t = clock();
+        xft16.getPredecessor((uint64_t) i);
+        fprintf(f, "%f ", (double) (clock() - t) / CLOCKS_PER_SEC);
+    }
 
-    // cout << "Getlen: " << xft.getLen() << endl;
+    cout << "successor for XFastTrie(16)" << endl;
+    fprintf(f, "\nXFastTrie(16) successor\n");
+    for (int i = 1; i < (pow(2, 16) - 1) / 8; i += 2) {
+        time_t t = clock();
+        xft16.getSuccessor((uint64_t) i);
+        fprintf(f, "%f ", (double) (clock() - t) / CLOCKS_PER_SEC);
+    }
 
-    // cout << xft.getMax()->key << endl;
-    // printf("Max: %lu\n", xft.getMax()->key);
-    // printf("Min: %lu\n", xft.getMin()->key);
-    // printf("Len: %d\n", xft.getLen());
-    // Entry* suc_5 = xft.getSuccessor((uint64_t)5);
-    // Entry* suc_7 = xft.getSuccessor((uint64_t)7);
-    // Entry* pred_7 = xft.getPredecessor((uint64_t)7);
-    // Entry* pred_6 = xft.getPredecessor((uint64_t)6);
-    // printf("Suc5: %lu\n", suc_5->key);
-    // printf("Pred6: %lu\n", pred_6->key);
-    // printf("Succ7: %lu Pred7: %lu\n", suc_7->key, pred_7->key);
+    cout << "deletes from XFastTrie(16)" << endl;
+    fprintf(f, "\nXFastTrie(16) delete\n");
+    for (int i = 0; i < pow(2, 16) / 8; i += 2) {
+        time_t t = clock();
+        xft16.del((uint64_t) i);
+        fprintf(f, "%f ", (double) (clock() - t) / CLOCKS_PER_SEC);
+    }
 
-    // cout << "Should delete " << endl;
-    // xft.del((uint64_t) 5);
-    // xft.del((uint64_t) 9);
-    // xft.del((uint64_t) 12);
-    // xft.del((uint64_t) 13);
-
-    // for (int i = 0; i < 240; i++) {
-    //     cout << "delete " << i << endl;
-    //     xft.del((uint64_t) i);
-    // }
-
-
-    // // printf("%d\n", v -> getMax());
-    // // printf("%d\n", v -> getMin());
-    // // printf("%d\n", (v -> successor(9)));
-    // // printf("%d\n", (v -> predecessor(9)));
-    // // printf(v->findItem(9)?"found\n":"not found\n");
+    fclose(f);
 
     return 0;
 }

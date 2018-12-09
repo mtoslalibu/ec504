@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Run script
+# Comparison script
 
 set -e
 
@@ -22,5 +22,10 @@ echo "Compile main program using ${COMPILER}."
 ${COMPILER} -std=c++11 main.cpp -o main
 echo "Compiled successfully."
 
+echo $'\n================================================================================'
+echo "Please notice that THIS MAY TAKE LONG."
+echo $'================================================================================\n'
+
 echo $'\nRun program:'
+rm stat.txt 2> /dev/null
 ./main

@@ -169,7 +169,7 @@ XFastTrie::XFastTrie(int bts) {
     layers.reserve(bits);
     diff = 64 - bits;
 
-    for (int i = 0; i < bits; i++)
+    for (uint64_t i = 0; i < bits; i++)
         layers.push_back(map<uint64_t, Node*>());
 
     num = 0;
