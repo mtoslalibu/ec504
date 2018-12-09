@@ -18,9 +18,9 @@ else
     COMPILER=${CXX}
 fi
 
-echo "Compile main program using ${COMPILER}."
-${COMPILER} -std=c++11 main.cpp -o main
+echo "Compile cli program using ${COMPILER}."
+${COMPILER} -std=c++11 cli.cpp -o cli
 echo "Compiled successfully."
 
 echo $'\nRun program:'
-./main
+./cli
