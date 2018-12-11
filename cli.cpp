@@ -33,7 +33,8 @@ int main(int argc, char* argv[]) {
 
         switch (option) {
         case 1:
-            cout << "Veb Tree is created: "<< endl;
+            cout << "Veb Tree is created: [Plz don't use negative values!]"<< endl;
+            cout << "If no predecessor or successor found: return values are -1 and 65536 respectively.."<< endl;
 
             veb = new VEBTree(512);
 
