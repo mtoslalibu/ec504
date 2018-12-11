@@ -33,9 +33,7 @@ int main(int argc, char* argv[]) {
 
         switch (option) {
         case 1:
-            cout << "Please enter the key size: ";
-            int size;
-            cin >> size;
+            cout << "Veb Tree is created: "<< endl;
 
             veb = new VEBTree(512);
 
@@ -69,7 +67,7 @@ int main(int argc, char* argv[]) {
 
                     continue;
                 case 3:
-                    cout << "Delete key: ";
+                    cout << "Delete key: "<< endl;
                     int d_key;
                     cin >> d_key;
                     veb->deleteItem(d_key);
@@ -85,7 +83,7 @@ int main(int argc, char* argv[]) {
                     cout << "Find successor of key: ";
                     int s_key;
                     cin >> s_key;
-                    cout << "Successor is: " << veb->successor(s_key);
+                    cout << "Successor is: " << veb->successor(s_key)<< endl;
                     continue;
                 case 6:
                     break;
