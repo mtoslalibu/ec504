@@ -162,7 +162,7 @@ int main(int argc, char* argv[]) {
                     uint64_t p_key;
                     cin >> p_key;
                     predecessor = xft.getPredecessor(p_key);
-                    cout << "Predecessor is: " << endl;
+                    cout << "Predecessor is: ";
                     if (predecessor)
                         cout << predecessor->key;
                     else
@@ -178,7 +178,7 @@ int main(int argc, char* argv[]) {
                     if (successor)
                         cout << successor->key;
                     else
-                        cout << "There is no predecessor of " << s_key << endl;
+                        cout << "There is no successor of " << s_key << endl;
 
                     continue;
                 case 6:
