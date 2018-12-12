@@ -1,8 +1,8 @@
 /*
 
- Beliz Kaleli, Mert Toslali and Novak Boskov
+  Beliz Kaleli, Mert Toslali and Novak Boskov
 
- */
+*/
 
 #include <iostream>
 #include <vector>
@@ -15,21 +15,21 @@ using namespace std;
 
 // Returns vector of numbers. Handles comma separated string inputs.
 vector<int> getNums() {
-     vector<int> ret;
-     string input;
-     int c;
+    vector<int> ret;
+    string input;
+    int c;
 
-     cin.ignore();
-     getline(cin, input);
-     stringstream ss(input);
-     while (ss >> c) {
-         ret.push_back(c);
+    cin.ignore();
+    getline(cin, input);
+    stringstream ss(input);
+    while (ss >> c) {
+        ret.push_back(c);
 
-         if (ss.peek() == ',' || ss.peek() == ' ')
-             ss.ignore();
-     }
+        if (ss.peek() == ',' || ss.peek() == ' ')
+            ss.ignore();
+    }
 
-     return ret;
+    return ret;
 }
 
 int main(int argc, char* argv[]) {
@@ -65,7 +65,9 @@ int main(int argc, char* argv[]) {
                 cout << "3) for delete" << endl;
                 cout << "4) for predecessor" << endl;
                 cout << "5) for successor" << endl;
-                cout << "6) construct new data structure" << endl;
+                cout << "6) for minimum" << endl;
+                cout << "7) for maximum" << endl;
+                cout << "8) construct new data structure" << endl;
                 cout << ">> ";
                 int operation;
                 cin >> operation;
@@ -111,6 +113,12 @@ int main(int argc, char* argv[]) {
                     cout << "Successor is: " << veb->successor(s_key)<< endl;
                     continue;
                 case 6:
+                    cout << "Minimum is: " << veb->getMin() << endl;
+                    continue;
+                case 7:
+                    cout << "Maximum is: " << veb->getMax() << endl;
+                    continue;
+                case 8:
                     break;
                 }
 
@@ -145,7 +153,9 @@ int main(int argc, char* argv[]) {
                 cout << "3) for delete" << endl;
                 cout << "4) for predecessor" << endl;
                 cout << "5) for successor" << endl;
-                cout << "6) construct new data structure" << endl;
+                cout << "6) for minimum" << endl;
+                cout << "7) for maximum" << endl;
+                cout << "8) construct new data structure" << endl;
                 cout << ">> ";
                 int operation;
                 cin >> operation;
@@ -209,6 +219,22 @@ int main(int argc, char* argv[]) {
 
                     continue;
                 case 6:
+                    e = xft.getMin();
+                    if (e)
+                        cout << "Minimum is: " << e->key << endl;
+                    else
+                        cout << "There is no minimum." << endl;
+
+                    continue;
+                case 7:
+                    e = xft.getMax();
+                    if (e)
+                        cout << "Maximum is: " << e->key << endl;
+                    else
+                        cout << "There is no maximum." << endl;
+
+                    continue;
+                case 8:
                     break;
                 }
 
