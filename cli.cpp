@@ -7,10 +7,30 @@
 #include <iostream>
 #include <vector>
 #include <math.h>
+#include <sstream>
 #include "vEB.hpp"
 #include "XFastTrie.hpp"
 
 using namespace std;
+
+// Returns vector of numbers. Handles comma separated string inputs.
+vector<int> getNums() {
+     vector<int> ret;
+     string input;
+     int c;
+
+     cin.ignore();
+     getline(cin, input);
+     stringstream ss(input);
+     while (ss >> c) {
+         ret.push_back(c);
+
+         if (ss.peek() == ',' || ss.peek() == ' ')
+             ss.ignore();
+     }
+
+     return ret;
+}
 
 int main(int argc, char* argv[]) {
     cout << "Van Emde Boas tree vs x-Fast trie \n"
@@ -39,7 +59,7 @@ int main(int argc, char* argv[]) {
             veb = new VEBTree(512);
 
             while (1) {
-                cout << "Please choose the operation:" << endl;
+                cout << endl << "Please choose the operation:" << endl;
                 cout << "1) for insert" << endl;
                 cout << "2) for lookup" << endl;
                 cout << "3) for delete" << endl;
@@ -50,12 +70,16 @@ int main(int argc, char* argv[]) {
                 int operation;
                 cin >> operation;
 
+                vector<int> input_nums;
+
                 switch (operation) {
                 case 1:
-                    cout << "Insert number: ";
-                    int n;
-                    cin >> n;
-                    veb->insert(n);
+                    cout << "Insert numbers [in format: 1,2,3]: ";
+                    input_nums = getNums();
+
+                    for (int n : input_nums)
+                        veb->insert(n);
+
                     continue;
                 case 2:
                     cout << "Lookup key: ";
@@ -68,7 +92,7 @@ int main(int argc, char* argv[]) {
 
                     continue;
                 case 3:
-                    cout << "Delete key: "<< endl;
+                    cout << "Delete key: ";
                     int d_key;
                     cin >> d_key;
                     veb->deleteItem(d_key);
@@ -115,7 +139,7 @@ int main(int argc, char* argv[]) {
             vector<Entry*> entries;
 
             while (1) {
-                cout << "Please choose the operation:" << endl;
+                cout << endl << "Please choose the operation:" << endl;
                 cout << "1) for insert" << endl;
                 cout << "2) for lookup" << endl;
                 cout << "3) for delete" << endl;
@@ -129,15 +153,19 @@ int main(int argc, char* argv[]) {
                 Entry* e = NULL;
                 Entry* predecessor = NULL;
                 Entry* successor = NULL;
+                vector<int> input_nums;
 
                 switch (operation) {
                 case 1:
-                    cout << "Insert number: ";
-                    uint64_t n;
-                    cin >> n;
-                    e = new Entry{n};
-                    entries.push_back(e);
-                    xft.insert(e);
+                    cout << "Insert numbers [in format: 1,2,3]: ";
+                    input_nums = getNums();
+
+                    for (int n : input_nums) {
+                        e = new Entry{(uint64_t) n};
+                        entries.push_back(e);
+                        xft.insert(e);
+                    }
+
                     continue;
                 case 2:
                     cout << "Lookup key: ";
